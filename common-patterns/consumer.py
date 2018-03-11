@@ -11,18 +11,10 @@ host = os.environ.get('HOST', '')
 
 
 async def consumer(message):
-    timer = randint(0, 5)/10
+    timer = randint(0, 5) / 10
     print("Sleeping for %s seconds" % timer)
     await asyncio.sleep(timer)
     print(message)
-
-async def hello(websocket, path):
-    name = await websocket.recv()
-    print("< {}".format(name))
-
-    greeting = "Hello {}!".format(name)
-    await websocket.send(greeting)
-    print("> {}".format(greeting))
 
 
 async def consumer_handler(websocket, path):

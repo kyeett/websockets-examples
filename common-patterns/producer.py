@@ -18,7 +18,6 @@ async def producer():
 
 
 async def producer_handler(websocket, path):
-    print("Path:" + path)
     while True:
         message = await producer()
         await websocket.send(message)
