@@ -5,6 +5,7 @@ import asyncio
 import websockets
 import os
 from random import randint
+import consul_calls
 
 port = int(os.environ.get('PORT', '8765'))
 host = os.environ.get('HOST', '')
@@ -17,6 +18,12 @@ async def producer():
     return "Server message #{}".format(producer.c)
 
 producer.c = 0
+
+async def consul_producer_handler(websocket, path):
+    message = await consul_calls.consul_services(url='http://localhost:8500')
+    print("services found:" + await message.text())
+    await websocket.send(await message.text())
+    print("> {}".format(message))
 
 
 async def producer_handler(websocket, path):
@@ -35,10 +42,9 @@ async def consumer_handler(websocket, path):
 
 
 async def handler(websocket, path):
-
     while True:
         consumer_task = asyncio.ensure_future(consumer_handler(websocket, path))
-        producer_task = asyncio.ensure_future(producer_handler(websocket, path))
+        producer_task = asyncio.ensure_future(consul_producer_handler(websocket, path))
         done, pending = await asyncio.wait(
             [consumer_task, producer_task],
             return_when=asyncio.FIRST_COMPLETED,
